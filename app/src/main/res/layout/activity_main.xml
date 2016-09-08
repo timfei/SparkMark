@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="@dimen/dimen_3dp"
     tools:context=".activity.MainActivity">
 
     <GridView
@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:horizontalSpacing="@dimen/dimen_3dp"
         android:numColumns="3"
+        android:paddingBottom="@dimen/dimen_3dp"
         android:paddingLeft="@dimen/dimen_3dp"
         android:paddingRight="@dimen/dimen_3dp"
         android:stretchMode="columnWidth"

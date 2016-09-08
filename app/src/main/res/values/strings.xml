@@ -3,4 +3,5 @@
     <string name="take_photo">Take Photo</string>
     <string name="convert">Convert</string>
     <string name="all_images">All Images</string>
+    <string name="permission_tip">Please, check your permission</string>
 </resources>
