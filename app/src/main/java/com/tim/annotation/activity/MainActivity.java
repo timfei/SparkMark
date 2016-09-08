@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 new ImageSource(this, this);
