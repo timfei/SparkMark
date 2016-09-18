@@ -101,17 +101,16 @@ public class ImageSource implements LoaderManager.LoaderCallbacks<Cursor> {
                 } else {
                     imageFolders.get(imageFolders.indexOf(imageFolder)).images.add(imageItem);
                 }
-
-                if (data.getCount() > 0) {
-                    ImageFolder allImagesFolder = new ImageFolder();
-                    allImagesFolder.name = activity.getResources().getString(R.string.all_images);
-                    allImagesFolder.path = "/";
-                    if (allImages.size() != 0) {
-                        allImagesFolder.cover = allImages.get(0);
-                    }
-                    allImagesFolder.images = allImages;
-                    imageFolders.add(0, allImagesFolder);
+            }
+            if (data.getCount() > 0) {
+                ImageFolder allImagesFolder = new ImageFolder();
+                allImagesFolder.name = activity.getResources().getString(R.string.all_images);
+                allImagesFolder.path = "/";
+                if (allImages.size() != 0) {
+                    allImagesFolder.cover = allImages.get(0);
                 }
+                allImagesFolder.images = allImages;
+                imageFolders.add(0, allImagesFolder);
             }
         }
         listener.imageLoadFinish(imageFolders);

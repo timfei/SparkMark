@@ -1,6 +1,7 @@
 package com.tim.annotation.loader;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.widget.ImageView;
 
@@ -15,8 +16,8 @@ import java.io.File;
  */
 public class GlideImageLoader implements ImageLoader {
     @Override
-    public void displayImage(Activity activity, String path, ImageView imageView, int width, int height) {
-        Glide.with(activity)
+    public void displayImage(Context context, String path, ImageView imageView) {
+        Glide.with(context)
                 .load(Uri.fromFile(new File(path)))
                 .error(R.drawable.ic_default_image)
                 .placeholder(R.drawable.ic_default_image)

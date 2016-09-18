@@ -1,6 +1,7 @@
 package com.tim.annotation.loader;
 
 import android.app.Activity;
+import android.content.Context;
 import android.widget.ImageView;
 
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.io.Serializable;
  */
 public interface ImageLoader extends Serializable {
 
-    void displayImage(Activity activity, String path, ImageView imageView, int width, int height);
+    void displayImage(Context context, String path, ImageView imageView);
 
     void clearMemoryCache();
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,10 +12,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:horizontalSpacing="@dimen/dimen_3dp"
-        android:numColumns="3"
         android:paddingBottom="@dimen/dimen_3dp"
         android:paddingLeft="@dimen/dimen_3dp"
         android:paddingRight="@dimen/dimen_3dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="@dimen/dimen_3dp"></GridView>
-</RelativeLayout>
+
+    <!--<GridView-->
+    <!--android:id="@+id/main_folder_gridview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:horizontalSpacing="@dimen/dimen_3dp"-->
+    <!--android:numColumns="3"-->
+    <!--android:paddingBottom="@dimen/dimen_3dp"-->
+    <!--android:paddingLeft="@dimen/dimen_3dp"-->
+    <!--android:paddingRight="@dimen/dimen_3dp"-->
+    <!--android:stretchMode="columnWidth"-->
+    <!--android:verticalSpacing="@dimen/dimen_3dp"></GridView>-->
+
+    <ProgressBar
+        android:id="@+id/main_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+</FrameLayout>
