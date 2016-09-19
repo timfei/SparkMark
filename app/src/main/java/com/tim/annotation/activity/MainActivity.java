@@ -100,12 +100,14 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
                 if (isFolderMode) {
                     mGridView.setNumColumns(3);
                     mGridView.setAdapter(mImageGridViewAdapter);
-                    mImageGridViewAdapter.refreshData(mAllImageFolder.images);
+                    if (mAllImageFolder != null) {
+                        mImageGridViewAdapter.refreshData(mAllImageFolder.images);
+                    }
                     isFolderMode = false;
                 } else {
                     mGridView.setNumColumns(2);
                     mGridView.setAdapter(mFolderAdapter);
-                    if (mImageFolders.size() > 0) {
+                    if (mImageFolders != null && mImageFolders.size() > 0) {
                         mFolderAdapter.refreshData(mImageFolders);
                     }
                     isFolderMode = true;
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
 
     @Override
     public void imageLoadFinish(List<ImageFolder> imageFolders) {
+        //when new image saved  gridView will reload and show all image
+        mGridView.setNumColumns(3);
         this.mImageFolders = imageFolders;
         if (mImageFolders.size() == 0) {
             mImageGridViewAdapter.refreshData(null);

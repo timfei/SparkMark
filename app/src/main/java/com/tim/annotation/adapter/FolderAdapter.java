@@ -1,6 +1,5 @@
 package com.tim.annotation.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
@@ -8,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.tim.annotation.R;
@@ -45,7 +42,10 @@ public class FolderAdapter extends BaseAdapter {
 
     public void refreshData(List<ImageFolder> folders) {
         if (folders != null && folders.size() > 0) {
-            mImageFolders = folders;
+            if (folders.get(0).path.equals("/")) {
+                folders.remove(0);
+            }
+            this.mImageFolders = folders;
         } else {
             mImageFolders.clear();
         }
