@@ -26,6 +26,7 @@ public class FolderAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private List<ImageFolder> mImageFolders;
     private Point size;
+    private OnFolderItemClickListener listener;
 
 
     public FolderAdapter(Context context, List<ImageFolder> folders, Point size) {
@@ -38,6 +39,10 @@ public class FolderAdapter extends BaseAdapter {
             mImageFolders = new ArrayList<>();
         }
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public void setOnFolderItemClickListener(OnFolderItemClickListener listener) {
+        this.listener = listener;
     }
 
     public void refreshData(List<ImageFolder> folders) {
@@ -69,8 +74,8 @@ public class FolderAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.item_folder_gridview, parent, false);
             viewHolder = new ViewHolder(convertView);
@@ -78,7 +83,7 @@ public class FolderAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        ImageFolder folder = (ImageFolder) getItem(position);
+        final ImageFolder folder = (ImageFolder) getItem(position);
         int coverWidth = size.x / 2;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(coverWidth, coverWidth);
         viewHolder.mCover.setLayoutParams(layoutParams);
@@ -87,6 +92,13 @@ public class FolderAdapter extends BaseAdapter {
         GlideImageLoader loader = new GlideImageLoader();
         loader.displayImage(context, folder.cover.path, viewHolder.mCover);
 
+        viewHolder.mCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onFolderItemClick(viewHolder.rootView, folder, position);
+            }
+        });
+
         return convertView;
     }
 
@@ -94,15 +106,19 @@ public class FolderAdapter extends BaseAdapter {
         ImageView mCover;
         TextView mFolderName;
         TextView mFolderImageCount;
+        View rootView;
 
         public ViewHolder(View view) {
+            rootView = view;
             mCover = (ImageView) view.findViewById(R.id.item_folder_cover_iv);
             mFolderName = (TextView) view.findViewById(R.id.item_folder_name_tv);
             mFolderImageCount = (TextView) view.findViewById(R.id.item_folder_count_tv);
             view.setTag(this);
         }
-
     }
 
+    public interface OnFolderItemClickListener {
+        void onFolderItemClick(View view, ImageFolder imageFolder, int position);
+    }
 
 }
