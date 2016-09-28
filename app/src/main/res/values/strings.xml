@@ -5,5 +5,7 @@
     <string name="save">Save</string>
     <string name="share">Share</string>
     <string name="all_images">All Images</string>
-    <string name="permission_tip">Please, check your permission</string>
+    <string name="permission_tip">Check your permission</string>
+    <string name="save_failed">Failed Try again</string>
+    <string name="no_image">No Images</string>
 </resources>

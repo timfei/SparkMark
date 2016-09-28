@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.tim.annotation.R;
@@ -36,9 +37,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements ImageSource.OnImageLoadFinished, ImageGridViewAdapter.OnImageItemClickListener, FolderAdapter.OnFolderItemClickListener {
 
     private GridView mGridView;
+    private ImageView mIV_Ghost;
     private List<ImageFolder> mImageFolders;
     private ImageGridViewAdapter mImageGridViewAdapter;
-    private ProgressBar mProgressBar;
     private FolderAdapter mFolderAdapter;
     private Point size;
     private ImageFolder mAllImageFolder;
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
 
         } else if (requestCode == CAMERA_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                takePhoto();
             }
         }
 
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
     private void initView() {
         mGridView = (GridView) findViewById(R.id.main_gridview);
         mGridView.setNumColumns(3);
-        mProgressBar = (ProgressBar) findViewById(R.id.main_progressbar);
+        mIV_Ghost = (ImageView) findViewById(R.id.main_ghost_iv);
     }
 
     @Override
@@ -149,14 +150,15 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
         this.mImageFolders = imageFolders;
         if (mImageFolders.size() == 0) {
             mImageGridViewAdapter.refreshData(null);
+            mIV_Ghost.setVisibility(View.VISIBLE);
+            Util.showToast(this, getResources().getString(R.string.no_image));
         } else {
+            mIV_Ghost.setVisibility(View.GONE);
             mAllImageFolder = mImageFolders.get(0);
             mImageGridViewAdapter.refreshData(mAllImageFolder.images);
         }
         mImageGridViewAdapter.setOnImageItemClickListener(this);
         mGridView.setAdapter(mImageGridViewAdapter);
-        mProgressBar.setVisibility(View.GONE);
-
     }
 
     @Override
@@ -188,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
                     intent.putExtra(Constant.EXTRA_PICK_IMAGE_ITEM, imageItem);
                     startActivity(intent);
                 }
-
         }
     }
 
