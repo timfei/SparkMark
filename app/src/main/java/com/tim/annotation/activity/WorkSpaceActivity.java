@@ -1,5 +1,7 @@
 package com.tim.annotation.activity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,13 +9,16 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.johnpersano.supertoasts.library.Style;
@@ -46,6 +51,8 @@ public class WorkSpaceActivity extends AppCompatActivity {
     private ImageItem mImageItem;
     private int screenWidth;
     private int screenHeight;
+    private ProgressDialog mSaveImageProgressDialog;
+    private String fileName;
     private static final String SAVE_PATH = "/storage/emulated/0/Annotation/";
 
     @Override
@@ -59,6 +66,7 @@ public class WorkSpaceActivity extends AppCompatActivity {
         screenWidth = size.x;
         screenHeight = size.y;
         initData();
+
     }
 
     private void initData() {
@@ -67,8 +75,22 @@ public class WorkSpaceActivity extends AppCompatActivity {
         mAnnotatedView.setBitmap(scaleBitmap(mImageItem.path), screenWidth, screenHeight);
     }
 
+    /**
+     * scale the image to fit screen width
+     *
+     * @param path
+     * @return
+     */
     private Bitmap scaleBitmap(String path) {
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        File file = new File(path);
+        Uri uri = Uri.fromFile(file);
+        Bitmap bitmap = null;
+        try {
+            bitmap = ImageUtil.getBitmap(this, uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        Bitmap bitmap = BitmapFactory.decodeFile(path);
         int h = bitmap.getHeight();
         int w = bitmap.getWidth();
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -93,7 +115,8 @@ public class WorkSpaceActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.workspace_save:
-                saveBitmap();
+                new SaveBitmapTask().execute();
+
                 break;
 
             case R.id.workspace_share:
@@ -110,7 +133,7 @@ public class WorkSpaceActivity extends AppCompatActivity {
         if (!dir.exists()) {
             dir.mkdir();
         }
-        String fileName = "IMG_" + System.currentTimeMillis() + ".jpg";
+        fileName = "IMG_" + System.currentTimeMillis() + ".jpg";
         File file = new File(dir, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(file);
@@ -119,15 +142,40 @@ public class WorkSpaceActivity extends AppCompatActivity {
                 fos.flush();
                 fos.close();
             }
-            Util.showToast(this, SAVE_PATH + fileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Util.showToast(this, getResources().getString(R.string.save_failed));
         } catch (IOException e) {
             e.printStackTrace();
-            Util.showToast(this, getResources().getString(R.string.save_failed));
+
         }
         ImageUtil.scanPhoto(this, file);
+    }
+
+    class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mSaveImageProgressDialog = new ProgressDialog(WorkSpaceActivity.this);
+            mSaveImageProgressDialog.show();
+            mSaveImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message));
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            saveBitmap();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                mSaveImageProgressDialog.dismiss();
+                Util.showToast(WorkSpaceActivity.this, SAVE_PATH + fileName);
+            } else {
+                Util.showToast(WorkSpaceActivity.this, getResources().getString(R.string.save_failed));
+            }
+        }
     }
 
 }

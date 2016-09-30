@@ -8,4 +8,5 @@
     <string name="permission_tip">Check your permission</string>
     <string name="save_failed">Failed Try again</string>
     <string name="no_image">No Images</string>
+    <string name="dialog_message">Saving...</string>
 </resources>

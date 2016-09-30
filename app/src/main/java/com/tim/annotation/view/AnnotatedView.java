@@ -17,10 +17,14 @@ import android.view.View;
 public class AnnotatedView extends View {
 
     private Bitmap loadedBitmap;
-    private int screenWidth;
-    private int screenHeight;
     private Path path;
     private Paint paint;
+
+    private int screenWidth;
+    private int screenHeight;
+    private int bitmapWidth;
+    private int bitmapHeight;
+
 
     public AnnotatedView(Context context) {
         super(context);
@@ -40,6 +44,7 @@ public class AnnotatedView extends View {
         paint.setStyle(Paint.Style.STROKE);
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -48,6 +53,11 @@ public class AnnotatedView extends View {
         }
         canvas.drawPath(path, paint);
     }
+
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        setMeasuredDimension(bitmapWidth, bitmapHeight);
+//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -72,6 +82,8 @@ public class AnnotatedView extends View {
 
     public void setBitmap(Bitmap bitmap, int x, int y) {
         this.loadedBitmap = bitmap;
+        this.bitmapWidth = loadedBitmap.getWidth();
+        this.bitmapHeight = loadedBitmap.getHeight();
         this.screenWidth = x;
         this.screenHeight = y;
         invalidate();
