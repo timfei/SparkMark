@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,9 +17,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.github.johnpersano.supertoasts.library.Style;
@@ -36,8 +41,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import at.markushi.ui.CircleButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -48,12 +55,18 @@ public class WorkSpaceActivity extends AppCompatActivity {
     @BindView(R.id.annotatedview)
     AnnotatedView mAnnotatedView;
 
+    @BindView(R.id.workspace_toolbox_btn)
+    CircleButton mToolbox;
+
     private ImageItem mImageItem;
     private int screenWidth;
     private int screenHeight;
     private ProgressDialog mSaveImageProgressDialog;
     private String fileName;
     private static final String SAVE_PATH = "/storage/emulated/0/Annotation/";
+    private LayoutInflater mInflater = null;
+    private PopupWindow mToolBoxPW;
+    private View toolBoxContentView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +79,8 @@ public class WorkSpaceActivity extends AppCompatActivity {
         screenWidth = size.x;
         screenHeight = size.y;
         initData();
+        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        setToolBoxPopupWindow();
 
     }
 
@@ -149,6 +164,29 @@ public class WorkSpaceActivity extends AppCompatActivity {
 
         }
         ImageUtil.scanPhoto(this, file);
+    }
+
+    private void setToolBoxPopupWindow() {
+        toolBoxContentView = mInflater.inflate(R.layout.popuwindow_toolbox, null);
+        mToolBoxPW = new PopupWindow(toolBoxContentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mToolBoxPW.setFocusable(true);
+        mToolBoxPW.setOutsideTouchable(true);
+        mToolBoxPW.update();
+        ColorDrawable backgroundColor = new ColorDrawable(0000000000);
+        mToolBoxPW.setBackgroundDrawable(backgroundColor);
+    }
+
+    private void showToolBoxPopuWindow(View parent) {
+        if (mToolBoxPW.isShowing()) {
+            mToolBoxPW.dismiss();
+        } else {
+            mToolBoxPW.showAsDropDown(parent, 0, parent.getLayoutParams().height / 2);
+        }
+    }
+
+    @OnClick(R.id.workspace_toolbox_btn)
+    public void toolBoxClick() {
+        showToolBoxPopuWindow(mToolbox);
     }
 
     class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
