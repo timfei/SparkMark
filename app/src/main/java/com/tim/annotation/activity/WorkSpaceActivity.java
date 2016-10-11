@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -16,19 +14,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.library.Style;
-import com.github.johnpersano.supertoasts.library.SuperActivityToast;
-import com.github.johnpersano.supertoasts.library.SuperToast;
 import com.tim.annotation.R;
 import com.tim.annotation.constants.Constant;
 import com.tim.annotation.entity.ImageItem;
@@ -42,21 +34,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import at.markushi.ui.CircleButton;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 /**
  * Created by TimFei on 16/9/18.
  */
-public class WorkSpaceActivity extends AppCompatActivity {
+public class WorkSpaceActivity extends AppCompatActivity implements View.OnClickListener {
 
-    @BindView(R.id.annotatedview)
-    AnnotatedView mAnnotatedView;
+    private AnnotatedView mAnnotatedView;
 
-    @BindView(R.id.workspace_toolbox_btn)
-    CircleButton mToolbox;
+    private CircleButton mToolbox;
+
+    private CircleButton mToolboxArrow;
+
+    private CircleButton mToolboxText;
+
+    private CircleButton mToolboxMosaic;
+
+    private CircleButton mToolboxRect;
 
     private ImageItem mImageItem;
     private int screenWidth;
@@ -72,7 +67,7 @@ public class WorkSpaceActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace);
-        ButterKnife.bind(this);
+        initView();
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -82,6 +77,12 @@ public class WorkSpaceActivity extends AppCompatActivity {
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setToolBoxPopupWindow();
 
+    }
+
+    private void initView() {
+        mAnnotatedView = (AnnotatedView) findViewById(R.id.annotatedview);
+        mToolbox = (CircleButton) findViewById(R.id.workspace_toolbox_btn);
+        mToolbox.setOnClickListener(this);
     }
 
     private void initData() {
@@ -131,7 +132,6 @@ public class WorkSpaceActivity extends AppCompatActivity {
         switch (id) {
             case R.id.workspace_save:
                 new SaveBitmapTask().execute();
-
                 break;
 
             case R.id.workspace_share:
@@ -174,9 +174,22 @@ public class WorkSpaceActivity extends AppCompatActivity {
         mToolBoxPW.update();
         ColorDrawable backgroundColor = new ColorDrawable(0000000000);
         mToolBoxPW.setBackgroundDrawable(backgroundColor);
+        initToolBoxView(toolBoxContentView);
+
     }
 
-    private void showToolBoxPopuWindow(View parent) {
+    private void initToolBoxView(View contentView) {
+        mToolboxArrow = (CircleButton) contentView.findViewById(R.id.toolbox_arrow);
+        mToolboxText = (CircleButton) contentView.findViewById(R.id.toolbox_text);
+        mToolboxMosaic = (CircleButton) contentView.findViewById(R.id.toolbox_mosaic);
+        mToolboxRect = (CircleButton) contentView.findViewById(R.id.toolbox_rect);
+        mToolboxArrow.setOnClickListener(this);
+        mToolboxText.setOnClickListener(this);
+        mToolboxMosaic.setOnClickListener(this);
+        mToolboxRect.setOnClickListener(this);
+    }
+
+    private void showToolBoxPopupWindow(View parent) {
         if (mToolBoxPW.isShowing()) {
             mToolBoxPW.dismiss();
         } else {
@@ -184,9 +197,38 @@ public class WorkSpaceActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.workspace_toolbox_btn)
-    public void toolBoxClick() {
-        showToolBoxPopuWindow(mToolbox);
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.workspace_toolbox_btn:
+                showToolBoxPopupWindow(mToolbox);
+                break;
+
+            case R.id.toolbox_arrow:
+
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow));
+                mToolBoxPW.dismiss();
+                break;
+
+            case R.id.toolbox_text:
+
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text));
+                mToolBoxPW.dismiss();
+                break;
+
+            case R.id.toolbox_mosaic:
+
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_mosaic));
+                mToolBoxPW.dismiss();
+                break;
+
+            case R.id.toolbox_rect:
+
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect));
+                mToolBoxPW.dismiss();
+                break;
+        }
+
     }
 
     class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
