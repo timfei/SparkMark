@@ -45,6 +45,8 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private CircleButton mToolbox;
 
+    private CircleButton mToolboxGesture;
+
     private CircleButton mToolboxArrow;
 
     private CircleButton mToolboxText;
@@ -179,10 +181,12 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initToolBoxView(View contentView) {
+        mToolboxGesture = (CircleButton) contentView.findViewById(R.id.toolbox_gesture);
         mToolboxArrow = (CircleButton) contentView.findViewById(R.id.toolbox_arrow);
         mToolboxText = (CircleButton) contentView.findViewById(R.id.toolbox_text);
         mToolboxMosaic = (CircleButton) contentView.findViewById(R.id.toolbox_mosaic);
         mToolboxRect = (CircleButton) contentView.findViewById(R.id.toolbox_rect);
+        mToolboxGesture.setOnClickListener(this);
         mToolboxArrow.setOnClickListener(this);
         mToolboxText.setOnClickListener(this);
         mToolboxMosaic.setOnClickListener(this);
@@ -204,26 +208,33 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
                 showToolBoxPopupWindow(mToolbox);
                 break;
 
-            case R.id.toolbox_arrow:
+            case R.id.toolbox_gesture:
+                mAnnotatedView.setTool(Constant.CODE_TOOL_GESTURE);
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture));
+                mToolBoxPW.dismiss();
+                break;
 
+
+            case R.id.toolbox_arrow:
+                mAnnotatedView.setTool(Constant.CODE_TOOL_ARROW);
                 mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_text:
-
+                mAnnotatedView.setTool(Constant.CODE_TOOL_TEXT);
                 mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_mosaic:
-
+                mAnnotatedView.setTool(Constant.CODE_TOOL_MOSAIC);
                 mToolbox.setImageDrawable(getDrawable(R.drawable.ic_mosaic));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_rect:
-
+                mAnnotatedView.setTool(Constant.CODE_TOOL_RECT);
                 mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect));
                 mToolBoxPW.dismiss();
                 break;
