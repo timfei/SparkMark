@@ -43,6 +43,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private AnnotatedView mAnnotatedView;
     private ImageView mToolbox;
+    
     private ImageItem mImageItem;
     private ProgressDialog mSaveImageProgressDialog;
     private String fileName;
@@ -67,7 +68,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         initData();
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setToolBoxPopupWindow();
-
     }
 
     private void initView() {
