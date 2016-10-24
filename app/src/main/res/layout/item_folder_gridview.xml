@@ -15,7 +15,7 @@
         android:layout_gravity="bottom"
         android:background="@color/black_alpha"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/padding_small">
+        android:paddingLeft="@dimen/padding_6dp">
 
         <TextView
             android:id="@+id/item_folder_name_tv"
@@ -25,7 +25,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:textColor="@color/white"
-            android:textSize="@dimen/font_small"/>
+            android:textSize="@dimen/font_12sp"/>
 
         <TextView
             android:id="@+id/item_folder_count_tv"
@@ -35,7 +35,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:textColor="@color/grey"
-            android:textSize="@dimen/font_small"/>
+            android:textSize="@dimen/font_12sp"/>
     </LinearLayout>
 
 

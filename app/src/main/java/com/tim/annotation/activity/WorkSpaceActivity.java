@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -13,12 +12,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 
 import com.tim.annotation.R;
@@ -42,39 +42,28 @@ import at.markushi.ui.CircleButton;
 public class WorkSpaceActivity extends AppCompatActivity implements View.OnClickListener {
 
     private AnnotatedView mAnnotatedView;
-
-    private CircleButton mToolbox;
-
-    private CircleButton mToolboxGesture;
-
-    private CircleButton mToolboxArrow;
-
-    private CircleButton mToolboxText;
-
-    private CircleButton mToolboxMosaic;
-
-    private CircleButton mToolboxRect;
-
+    private ImageView mToolbox;
     private ImageItem mImageItem;
-    private int screenWidth;
-    private int screenHeight;
     private ProgressDialog mSaveImageProgressDialog;
     private String fileName;
     private static final String SAVE_PATH = "/storage/emulated/0/Annotation/";
     private LayoutInflater mInflater = null;
     private PopupWindow mToolBoxPW;
     private View toolBoxContentView;
+    private ImageView mUnDo;
+    private ImageView mReDo;
+
+    private CircleButton mToolboxGesture;
+    private CircleButton mToolboxArrow;
+    private CircleButton mToolboxText;
+    private CircleButton mToolboxMosaic;
+    private CircleButton mToolboxRect;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace);
         initView();
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
         initData();
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setToolBoxPopupWindow();
@@ -83,14 +72,18 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private void initView() {
         mAnnotatedView = (AnnotatedView) findViewById(R.id.annotatedview);
-        mToolbox = (CircleButton) findViewById(R.id.workspace_toolbox_btn);
+        mToolbox = (ImageView) findViewById(R.id.workspace_toolbox);
+        mUnDo = (ImageView) findViewById(R.id.workspace_undo);
+        mReDo = (ImageView) findViewById(R.id.workspace_redo);
+        mUnDo.setOnClickListener(this);
+        mReDo.setOnClickListener(this);
         mToolbox.setOnClickListener(this);
     }
 
     private void initData() {
         Intent intent = getIntent();
         mImageItem = (ImageItem) intent.getSerializableExtra(Constant.EXTRA_PICK_IMAGE_ITEM);
-        mAnnotatedView.setBitmap(scaleBitmap(mImageItem.path), screenWidth, screenHeight);
+        mAnnotatedView.setBitmap(scaleBitmap(mImageItem.path));
     }
 
     /**
@@ -108,7 +101,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        Bitmap bitmap = BitmapFactory.decodeFile(path);
         int h = bitmap.getHeight();
         int w = bitmap.getWidth();
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -197,45 +189,53 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         if (mToolBoxPW.isShowing()) {
             mToolBoxPW.dismiss();
         } else {
-            mToolBoxPW.showAsDropDown(parent, 0, parent.getLayoutParams().height / 2);
+            mToolBoxPW.showAsDropDown(parent, 0, (findViewById(R.id.workspace_bottom_bar_ll).getLayoutParams().height) / 3);
         }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.workspace_toolbox_btn:
+            case R.id.workspace_toolbox:
                 showToolBoxPopupWindow(mToolbox);
+                break;
+
+            case R.id.workspace_undo:
+                mAnnotatedView.unDo();
+                break;
+
+            case R.id.workspace_redo:
+                mAnnotatedView.recover();
                 break;
 
             case R.id.toolbox_gesture:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_GESTURE);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture));
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture_48));
                 mToolBoxPW.dismiss();
                 break;
 
 
             case R.id.toolbox_arrow:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_ARROW);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow));
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow_48));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_text:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_TEXT);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text));
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text_48));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_mosaic:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_MOSAIC);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_mosaic));
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_mosaic_48));
                 mToolBoxPW.dismiss();
                 break;
 
             case R.id.toolbox_rect:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_RECT);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect));
+                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect_48));
                 mToolBoxPW.dismiss();
                 break;
         }

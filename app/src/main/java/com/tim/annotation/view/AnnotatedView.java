@@ -4,14 +4,19 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
+import android.graphics.Point;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
-import com.tim.annotation.constants.Constant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by TimFei on 2016/9/27.
@@ -19,121 +24,190 @@ import com.tim.annotation.constants.Constant;
 
 public class AnnotatedView extends View {
 
-    private Bitmap loadedBitmap;
-    private Path mPath;
-    private Paint mPaint;
+    private Path mDrawPath;
+
+    private Paint mDrawPaint, mCanvasPaint;
+
+    private Canvas mDrawCanvas;
+
+    private Bitmap mCanvasBitmap;
+
+    private Bitmap mLoadBitmap;
+
+    private static final int PRE_SIZE = 10;
+
+    private static List<DrawPath> savePath;
+
+    private static List<DrawPath> deletePath;
+
+    private DrawPath dp;
 
     private int screenWidth;
-    private int screenHeight;
-    private int bitmapWidth;
-    private int bitmapHeight;
 
-    private int toolCode;
-    private DrawPath dp;
+    private int screenHeight;
+
     private float mX;
     private float mY;
-    private static final float TOUCH_TOLERANCE = 4;
-    private float startX;
-    private float startY;
 
     private class DrawPath {
-        public Path path;
-        public Paint paint;
-    }
-
-    public AnnotatedView(Context context) {
-        super(context);
+        private Path path;
+        private Paint paint;
     }
 
     public AnnotatedView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setup();
+        savePath = new ArrayList<>();
+        deletePath = new ArrayList<>();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        screenWidth = size.x;
+        screenHeight = size.y;
+        initCanvas();
     }
 
-    private void setup() {
-        mPath = new Path();
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(Color.RED);
-        mPaint.setAntiAlias(true);
-        mPaint.setStrokeWidth(10);
-        mPaint.setStyle(Paint.Style.STROKE);
+
+    private void initCanvas() {
+        mDrawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mDrawPaint.setColor(Color.RED);
+        mDrawPaint.setAntiAlias(true);
+        mDrawPaint.setStrokeWidth(PRE_SIZE);
+        mDrawPaint.setStyle(Paint.Style.STROKE);
+        mDrawPaint.setStrokeJoin(Paint.Join.ROUND);
+        mDrawPaint.setStrokeCap(Paint.Cap.ROUND);
+        mDrawPaint.setPathEffect(new CornerPathEffect(50));
+        mCanvasPaint = new Paint(Paint.DITHER_FLAG);
+        mCanvasBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
+        mDrawCanvas = new Canvas(mCanvasBitmap);
+        mDrawCanvas.drawColor(Color.TRANSPARENT);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (loadedBitmap != null) {
-            canvas.drawBitmap(loadedBitmap, 0, (canvas.getHeight() - loadedBitmap.getHeight()) / 2, mPaint);
+        if (mLoadBitmap != null) {
+            int bitmapWidth = mLoadBitmap.getWidth();
+            int bitmapHeight = mLoadBitmap.getHeight();
+            int width = getWidth();
+            int height = getHeight();
+            canvas.drawBitmap(mLoadBitmap, (width - bitmapWidth) / 2, (height - bitmapHeight) / 2, null);
         }
-        canvas.drawPath(mPath, mPaint);
+        canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
+        if (mDrawPath != null) {
+            canvas.drawPath(mDrawPath, mDrawPaint);
+        }
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float touchX = event.getX();
-        float touchY = event.getY();
+        float x = event.getX();
+        float y = event.getY();
         switch (event.getAction()) {
-
             case MotionEvent.ACTION_DOWN:
-                startX = event.getX();
-                startY = event.getY();
-                mPath = new Path();
+                mDrawPath = new Path();
                 dp = new DrawPath();
-                dp.path = mPath;
-                dp.paint = mPaint;
-
-                touch_start(touchX, touchY);
-
-//                mPath.moveTo(touchX, touchY);
+                dp.path = mDrawPath;
+                dp.paint = mDrawPaint;
+                touch_start(x, y);
+                invalidate();
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                touch_move(touchX,touchY);
-//                mPath.lineTo(touchX, touchY);
+                touch_move(x, y);
+                invalidate();
                 break;
 
-            default:
-                return false;
+            case MotionEvent.ACTION_UP:
+                touch_up();
+                invalidate();
+                break;
         }
-        invalidate();
         return true;
     }
 
-    public void setTool(int toolCode) {
-        this.toolCode = toolCode;
+    private void touch_up() {
+        mDrawPath.lineTo(mX, mY);
+        mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
+        savePath.add(dp);
+        mDrawPath = null;
     }
 
     private void touch_move(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(mY - y);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            if (toolCode == Constant.CODE_TOOL_RECT) {
-                mPath.reset();
-                RectF rectF = new RectF(startX, startX, x, y);
-                mPath.addRect(rectF, Path.Direction.CCW);
-            }
+        if (dx >= 4 || dy >= 4) {
+            mDrawPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
         }
-
     }
 
     private void touch_start(float x, float y) {
-        mPath.moveTo(x, y);
+        mDrawPath.moveTo(x, y);
         mX = x;
         mY = y;
     }
 
-    private void touch_up(){
-        
+
+    public void unDo() {
+        if (savePath != null && savePath.size() > 0) {
+            DrawPath drawPath = savePath.get(savePath.size() - 1);
+            deletePath.add(drawPath);
+            savePath.remove(savePath.size() - 1);
+            reDrawOnBitmap();
+        }
     }
 
-    public void setBitmap(Bitmap bitmap, int x, int y) {
-        this.loadedBitmap = bitmap;
-        this.bitmapWidth = loadedBitmap.getWidth();
-        this.bitmapHeight = loadedBitmap.getHeight();
-        this.screenWidth = x;
-        this.screenHeight = y;
+
+    public void recover() {
+        if (deletePath.size() > 0) {
+            DrawPath dp = deletePath.get(deletePath.size() - 1);
+            savePath.add(dp);
+            mDrawCanvas.drawPath(dp.path, dp.paint);
+            deletePath.remove(deletePath.size() - 1);
+            invalidate();
+        }
+    }
+
+
+    public void reDo() {
+        if (savePath != null && savePath.size() > 0) {
+            savePath.clear();
+            reDrawOnBitmap();
+        }
+    }
+
+
+    private void reDrawOnBitmap() {
+        initCanvas();
+        Iterator<DrawPath> iterator = savePath.iterator();
+        while (iterator.hasNext()) {
+            DrawPath drawPath = iterator.next();
+            mDrawCanvas.drawPath(drawPath.path, drawPath.paint);
+        }
         invalidate();
     }
+
+
+    public void setBitmap(Bitmap bitmap) {
+        if (bitmap != null) {
+            mLoadBitmap = bitmap;
+            invalidate();
+        }
+    }
+
+    public int getSavePathCount() {
+        if (savePath != null) {
+            return savePath.size();
+        }
+        return 0;
+    }
+
+    public void setTool(int toolCode) {
+
+
+    }
+
 }
