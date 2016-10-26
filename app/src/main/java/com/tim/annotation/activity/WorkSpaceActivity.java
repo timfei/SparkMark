@@ -43,7 +43,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private AnnotatedView mAnnotatedView;
     private ImageView mToolbox;
-    
+
     private ImageItem mImageItem;
     private ProgressDialog mSaveImageProgressDialog;
     private String fileName;
@@ -66,7 +66,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_workspace);
         initView();
         initData();
-        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setToolBoxPopupWindow();
     }
 
@@ -83,11 +82,16 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     private void initData() {
         Intent intent = getIntent();
         mImageItem = (ImageItem) intent.getSerializableExtra(Constant.EXTRA_PICK_IMAGE_ITEM);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
         mAnnotatedView.setBitmap(scaleBitmap(mImageItem.path));
     }
 
     /**
-     * scale the image to fit screen width
+     * scale the image to fit screen
      *
      * @param path
      * @return
@@ -95,23 +99,30 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     private Bitmap scaleBitmap(String path) {
         File file = new File(path);
         Uri uri = Uri.fromFile(file);
-        Bitmap bitmap = null;
         try {
+            Bitmap bitmap = null;
             bitmap = ImageUtil.getBitmap(this, uri);
+            int bitmapHeight = bitmap.getHeight();
+            int bitmapWidth = bitmap.getWidth();
+            int canvasWidth = mAnnotatedView.getWidth();
+            int canvasHeight = mAnnotatedView.getHeight();
+            Matrix matrix = new Matrix();
+            if ((bitmapHeight > canvasHeight && bitmapHeight > bitmapWidth) || (bitmapHeight > bitmapWidth && bitmapHeight < canvasHeight)) {
+                int newWidth = canvasHeight * bitmapWidth / bitmapHeight;
+                float scaleWidth = ((float) newWidth) / bitmapWidth;
+                float scaleHeight = ((float) canvasHeight) / bitmapHeight;
+                matrix.postScale(scaleWidth, scaleHeight);
+            } else {
+                int newHeight = canvasWidth * bitmapHeight / bitmapWidth;
+                float scaleWidth = ((float) canvasWidth) / bitmapWidth;
+                float scaleHeight = ((float) newHeight) / bitmapHeight;
+                matrix.postScale(scaleWidth, scaleHeight);
+            }
+            return Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        int h = bitmap.getHeight();
-        int w = bitmap.getWidth();
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        int ww = dm.widthPixels;
-        int newHeight = ww * h / w;
-        float scaleWidth = ((float) ww) / w;
-        float scaleHeight = ((float) newHeight) / h;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
-        return newBitmap;
+        return null;
     }
 
     @Override
@@ -161,6 +172,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void setToolBoxPopupWindow() {
+        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         toolBoxContentView = mInflater.inflate(R.layout.popuwindow_toolbox, null);
         mToolBoxPW = new PopupWindow(toolBoxContentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mToolBoxPW.setFocusable(true);
