@@ -131,6 +131,7 @@ public class AnnotatedView extends View {
         mDrawPath.lineTo(mX, mY);
         mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
         savePath.add(dp);
+        deletePath.clear();
         mDrawPath = null;
     }
 
