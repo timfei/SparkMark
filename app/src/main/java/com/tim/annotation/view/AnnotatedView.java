@@ -8,6 +8,7 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -137,7 +138,9 @@ public class AnnotatedView extends View {
     }
 
     private void touch_up() {
-        mDrawPath.lineTo(mX, mY);
+        if (currentToolCode == Constant.CODE_TOOL_GESTURE) {
+            mDrawPath.lineTo(mX, mY);
+        }
         mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
         savePath.add(dp);
         deletePath.clear();
@@ -153,6 +156,10 @@ public class AnnotatedView extends View {
             } else if (currentToolCode == Constant.CODE_TOOL_ARROW) {
                 mDrawPath.reset();
                 drawArrow((int) startX, (int) startY, (int) x, (int) y);
+            } else if (currentToolCode == Constant.CODE_TOOL_RECT) {
+                mDrawPath.reset();
+                RectF rectF = new RectF(startX, startY, x, y);
+                mDrawPath.addRect(rectF, Path.Direction.CCW);
             }
             mX = x;
             mY = y;
