@@ -65,9 +65,12 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
         }
         boolean hasPermission = Util.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (hasPermission) {
+            mIV_Ghost.setVisibility(View.GONE);
             new ImageSource(this, this);
             mImageGridViewAdapter = new ImageGridViewAdapter(this, null, size);
             mFolderAdapter = new FolderAdapter(this, null, size);
+        } else {
+            mIV_Ghost.setVisibility(View.VISIBLE);
         }
     }
 
@@ -108,17 +111,20 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
                 }
-                boolean hasPermission = Util.checkSelfPermission(this, Manifest.permission.CAMERA);
-                if (hasPermission) {
+                boolean hasTakePhotoPermission = Util.checkSelfPermission(this, Manifest.permission.CAMERA);
+                if (hasTakePhotoPermission) {
                     takePhoto();
                 }
                 break;
 
             case R.id.main_convert:
-                if (isFolderMode) {
-                    switchToAllImage();
-                } else {
-                    switchToFolder();
+                boolean hasStoragePermission = Util.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if (hasStoragePermission) {
+                    if (isFolderMode) {
+                        switchToAllImage();
+                    } else {
+                        switchToFolder();
+                    }
                 }
                 break;
         }
