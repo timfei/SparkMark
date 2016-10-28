@@ -14,6 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.tim.annotation.constants.Constant;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +37,12 @@ public class AnnotatedView extends View {
     private Bitmap mLoadBitmap;
 
     private static final int PRE_SIZE = 10;
+
+    private int currentToolCode = 10;
+
+    private float startX;
+
+    private float startY;
 
     private static List<DrawPath> savePath;
 
@@ -76,7 +84,6 @@ public class AnnotatedView extends View {
         mDrawPaint.setStyle(Paint.Style.STROKE);
         mDrawPaint.setStrokeJoin(Paint.Join.ROUND);
         mDrawPaint.setStrokeCap(Paint.Cap.ROUND);
-        mDrawPaint.setPathEffect(new CornerPathEffect(50));
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         mCanvasBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
         mDrawCanvas = new Canvas(mCanvasBitmap);
@@ -106,6 +113,8 @@ public class AnnotatedView extends View {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                startX = event.getX();
+                startY = event.getY();
                 mDrawPath = new Path();
                 dp = new DrawPath();
                 dp.path = mDrawPath;
@@ -139,7 +148,12 @@ public class AnnotatedView extends View {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(mY - y);
         if (dx >= 4 || dy >= 4) {
-            mDrawPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            if (currentToolCode == Constant.CODE_TOOL_GESTURE) {
+                mDrawPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            } else if (currentToolCode == Constant.CODE_TOOL_ARROW) {
+                mDrawPath.reset();
+                drawArrow((int) startX, (int) startY, (int) x, (int) y);
+            }
             mX = x;
             mY = y;
         }
@@ -191,6 +205,45 @@ public class AnnotatedView extends View {
         invalidate();
     }
 
+    public void drawArrow(int startX, int startY, int endX, int endY) {
+        double lineLength = Math.sqrt(Math.pow(Math.abs(endX - startX), 2) + Math.pow(Math.abs(endY - startY), 2));
+        double H = 0;
+        double L = 0;
+        if (lineLength < 320) {
+            H = lineLength / 4;
+            L = lineLength / 6;
+        } else {
+            H = 80;
+            L = 50;
+        }
+        double arrowAngle = Math.atan(L / H);
+        double arrowLen = Math.sqrt(L * L + H * H);
+        double[] pointXY1 = rotateVec(endX - startX, endY - startY, arrowAngle, true, arrowLen);
+        double[] pointXY2 = rotateVec(endX - startX, endY - startY, -arrowAngle, true, arrowLen);
+        int x3 = (int) (endX - pointXY1[0]);
+        int y3 = (int) (endY - pointXY1[1]);
+        int x4 = (int) (endX - pointXY2[0]);
+        int y4 = (int) (endY - pointXY2[1]);
+        mDrawPath.moveTo(startX, startY);
+        mDrawPath.lineTo(endX, endY);
+        mDrawPath.moveTo(x3, y3);
+        mDrawPath.lineTo(endX, endY);
+        mDrawPath.lineTo(x4, y4);
+
+    }
+
+    public double[] rotateVec(int x, int y, double ang, boolean isChLen, double newLen) {
+        double pointXY[] = new double[2];
+        double vx = x * Math.cos(ang) - y * Math.sin(ang);
+        double vy = x * Math.sin(ang) + y * Math.cos(ang);
+        if (isChLen) {
+            double d = Math.sqrt(vx * vx + vy * vy);
+            pointXY[0] = vx / d * newLen;
+            pointXY[1] = vy / d * newLen;
+        }
+        return pointXY;
+    }
+
 
     public void setBitmap(Bitmap bitmap) {
         if (bitmap != null) {
@@ -207,9 +260,8 @@ public class AnnotatedView extends View {
     }
 
     public void setTool(int toolCode) {
-
+        this.currentToolCode = toolCode;
     }
-
 
 
 }

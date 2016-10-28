@@ -39,20 +39,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/padding_8dp"
-                android:src="@drawable/ic_settings"/>
-
-
-            <!--<at.markushi.ui.CircleButton-->
-            <!--android:id="@+id/workspace_toolbox_btn"-->
-            <!--android:layout_width="@dimen/size_36dp"-->
-            <!--android:layout_height="@dimen/size_36dp"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_gravity="bottom|left"-->
-            <!--android:layout_marginBottom="@dimen/margin_8dp"-->
-            <!--android:layout_marginLeft="@dimen/margin_8dp"-->
-            <!--android:src="@drawable/ic_settings"-->
-            <!--app:cb_color="@color/toolbox_color"/>-->
+                android:src="@drawable/ic_gesture_48"/>
 
 
         </RelativeLayout>

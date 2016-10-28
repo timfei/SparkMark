@@ -37,7 +37,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import at.markushi.ui.CircleButton;
-//import me.drakeet.materialdialog.MaterialDialog;
 
 
 /**
