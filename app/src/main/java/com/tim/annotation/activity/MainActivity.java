@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
     public void onImageItemClick(View view, ImageItem imageItem, int position) {
         Intent intent = new Intent(this, WorkSpaceActivity.class);
         intent.putExtra(Constant.EXTRA_PICK_IMAGE_ITEM, imageItem);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 

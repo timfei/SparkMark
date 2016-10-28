@@ -2,6 +2,7 @@ package com.tim.annotation.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -9,10 +10,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.tim.annotation.R;
 import com.tim.annotation.constants.Constant;
 import com.tim.annotation.entity.ImageItem;
@@ -34,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import at.markushi.ui.CircleButton;
+//import me.drakeet.materialdialog.MaterialDialog;
 
 
 /**
@@ -64,6 +68,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initView();
         initData();
         setToolBoxPopupWindow();
@@ -141,6 +146,14 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
             case R.id.workspace_share:
 
+                break;
+
+            case android.R.id.home:
+                if (mAnnotatedView.getSavePathCount() != 0) {
+                    backConfirm();
+                } else {
+                    finish();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -281,4 +294,38 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    private void backConfirm() {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
+                .title(getResources().getString(R.string.dialog_discard_title))
+                .content(getResources().getString(R.string.dialog_discard_message))
+                .positiveText(getResources().getString(R.string.dialog_positive_button))
+                .negativeText(getResources().getString(R.string.dialog_negative_button))
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mAnnotatedView.getSavePathCount() != 0) {
+            backConfirm();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
 }

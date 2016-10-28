@@ -9,4 +9,8 @@
     <string name="save_failed">Failed Try again</string>
     <string name="no_image">No Images</string>
     <string name="dialog_message">Saving...</string>
+    <string name="dialog_discard_title">Discard changes?</string>
+    <string name="dialog_discard_message">Your changes are not saved</string>
+    <string name="dialog_positive_button">DISCARD</string>
+    <string name="dialog_negative_button">CANCEL</string>
 </resources>
