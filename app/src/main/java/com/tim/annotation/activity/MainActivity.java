@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
@@ -32,6 +33,9 @@ import com.tim.annotation.util.ImageUtil;
 import com.tim.annotation.util.Util;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ImageSource.OnImageLoadFinished, ImageGridViewAdapter.OnImageItemClickListener, FolderAdapter.OnFolderItemClickListener {
@@ -142,7 +146,8 @@ public class MainActivity extends AppCompatActivity implements ImageSource.OnIma
             }
             photoFile = ImageUtil.createFile(photoFile, "IMG_", ".jpg");
             if (photoFile != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        FileProvider.getUriForFile(this, getResources().getString(R.string.file_provider_name), photoFile));
             }
         }
         startActivityForResult(intent, Constant.EXTRA_TAKE_PHOTO_CODE);

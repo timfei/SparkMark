@@ -13,4 +13,5 @@
     <string name="dialog_discard_message">Your changes are not saved</string>
     <string name="dialog_positive_button">DISCARD</string>
     <string name="dialog_negative_button">CANCEL</string>
+    <string name="file_provider_name">com.timfei.file_provider</string>
 </resources>
