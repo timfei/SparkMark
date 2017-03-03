@@ -31,14 +31,6 @@
         app:cb_color="@color/toolbox_color"/>
 
     <at.markushi.ui.CircleButton
-        android:id="@+id/toolbox_mosaic"
-        android:layout_width="@dimen/size_36dp"
-        android:layout_height="@dimen/size_36dp"
-        android:layout_marginTop="@dimen/margin_8dp"
-        android:src="@drawable/ic_mosaic"
-        app:cb_color="@color/toolbox_color"/>
-
-    <at.markushi.ui.CircleButton
         android:id="@+id/toolbox_rect"
         android:layout_width="@dimen/size_36dp"
         android:layout_height="@dimen/size_36dp"

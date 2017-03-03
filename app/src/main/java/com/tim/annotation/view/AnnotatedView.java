@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -158,8 +157,19 @@ public class AnnotatedView extends View {
                 drawArrow((int) startX, (int) startY, (int) x, (int) y);
             } else if (currentToolCode == Constant.CODE_TOOL_RECT) {
                 mDrawPath.reset();
-                RectF rectF = new RectF(startX, startY, x, y);
-                mDrawPath.addRect(rectF, Path.Direction.CCW);
+                if (x < startX && y < startY) {
+                    RectF rectF = new RectF(x, y, startX, startY);  //top left
+                    mDrawPath.addRect(rectF, Path.Direction.CCW);
+                } else if (x < startX && y > startY) {
+                    RectF rectF = new RectF(x, startY, startX, y);  //bottom left
+                    mDrawPath.addRect(rectF, Path.Direction.CCW);
+                } else if (x > startX && y < startY) {
+                    RectF rectF = new RectF(startX, y, x, startY);  //top right
+                    mDrawPath.addRect(rectF, Path.Direction.CCW);
+                } else if (x > startX && y > startY) {
+                    RectF rectF = new RectF(startX, startY, x, y);  //bottom right
+                    mDrawPath.addRect(rectF, Path.Direction.CCW);
+                }
             }
             mX = x;
             mY = y;

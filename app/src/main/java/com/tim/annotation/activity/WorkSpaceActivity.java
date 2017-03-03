@@ -60,7 +60,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     private CircleButton mToolboxGesture;
     private CircleButton mToolboxArrow;
     private CircleButton mToolboxText;
-    private CircleButton mToolboxMosaic;
     private CircleButton mToolboxRect;
 
     @Override
@@ -200,12 +199,10 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         mToolboxGesture = (CircleButton) contentView.findViewById(R.id.toolbox_gesture);
         mToolboxArrow = (CircleButton) contentView.findViewById(R.id.toolbox_arrow);
         mToolboxText = (CircleButton) contentView.findViewById(R.id.toolbox_text);
-        mToolboxMosaic = (CircleButton) contentView.findViewById(R.id.toolbox_mosaic);
         mToolboxRect = (CircleButton) contentView.findViewById(R.id.toolbox_rect);
         mToolboxGesture.setOnClickListener(this);
         mToolboxArrow.setOnClickListener(this);
         mToolboxText.setOnClickListener(this);
-        mToolboxMosaic.setOnClickListener(this);
         mToolboxRect.setOnClickListener(this);
     }
 
@@ -248,12 +245,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
             case R.id.toolbox_text:
                 mAnnotatedView.setTool(Constant.CODE_TOOL_TEXT);
                 mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text_48));
-                mToolBoxPW.dismiss();
-                break;
-
-            case R.id.toolbox_mosaic:
-                mAnnotatedView.setTool(Constant.CODE_TOOL_MOSAIC);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_mosaic_48));
                 mToolBoxPW.dismiss();
                 break;
 
