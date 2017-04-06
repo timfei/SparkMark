@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -218,7 +219,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         if (mToolBoxPW.isShowing()) {
             mToolBoxPW.dismiss();
         } else {
-            mToolBoxPW.showAsDropDown(parent, 0, (findViewById(R.id.workspace_bottom_bar_ll).getLayoutParams().height) / 3);
+            mToolBoxPW.showAsDropDown(parent, 0, mLl_ToolBar.getHeight() / 2);
         }
     }
 
@@ -226,7 +227,31 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.workspace_toolbox:
-                showToolBoxPopupWindow(mToolbox);
+                new MaterialDialog.Builder(this)
+                        .items(R.array.work_tool_items)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                switch (position) {
+                                    case 0:
+                                        mAnnotatedView.setTool(Constant.CODE_TOOL_GESTURE);
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture_48));
+                                        break;
+
+                                    case 1:
+                                        mAnnotatedView.setTool(Constant.CODE_TOOL_ARROW);
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow_48));
+                                        break;
+
+                                    case 2:
+                                        mAnnotatedView.setTool(Constant.CODE_TOOL_RECT);
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect_48));
+                                        break;
+                                }
+
+                            }
+                        }).show();
+//                showToolBoxPopupWindow(mToolbox);
                 break;
 
             case R.id.workspace_undo:
