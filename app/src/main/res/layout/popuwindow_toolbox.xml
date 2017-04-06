@@ -28,6 +28,7 @@
         android:layout_height="@dimen/size_36dp"
         android:layout_marginTop="@dimen/margin_8dp"
         android:src="@drawable/ic_text"
+        android:visibility="gone"
         app:cb_color="@color/toolbox_color"/>
 
     <at.markushi.ui.CircleButton

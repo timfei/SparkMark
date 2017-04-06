@@ -1,24 +1,26 @@
 package com.tim.annotation.activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
@@ -46,9 +48,10 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private AnnotatedView mAnnotatedView;
     private ImageView mToolbox;
-
+    private View mLl_ToolBar;
     private ImageItem mImageItem;
     private ProgressDialog mSaveImageProgressDialog;
+    private ProgressDialog mLoadingImageProgressDialog;
     private String fileName;
     private static final String SAVE_PATH = "/storage/emulated/0/Annotation/";
     private LayoutInflater mInflater = null;
@@ -56,6 +59,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     private View toolBoxContentView;
     private ImageView mUnDo;
     private ImageView mReDo;
+    private boolean isLoaded;
 
     private CircleButton mToolboxGesture;
     private CircleButton mToolboxArrow;
@@ -70,9 +74,26 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         initView();
         initData();
         setToolBoxPopupWindow();
+        loadImage();
+    }
+
+    private void loadImage() {
+        ViewTreeObserver viewTreeObserver = mAnnotatedView.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (!isLoaded) {
+                        new LoadImageTask().execute();
+                        isLoaded = true;
+                    }
+                }
+            });
+        }
     }
 
     private void initView() {
+        mLl_ToolBar = findViewById(R.id.workspace_bottom_bar_ll);
         mAnnotatedView = (AnnotatedView) findViewById(R.id.annotatedview);
         mToolbox = (ImageView) findViewById(R.id.workspace_toolbox);
         mUnDo = (ImageView) findViewById(R.id.workspace_undo);
@@ -87,12 +108,6 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         mImageItem = (ImageItem) intent.getSerializableExtra(Constant.EXTRA_PICK_IMAGE_ITEM);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        mAnnotatedView.setBitmap(scaleBitmap(mImageItem.path));
-    }
-
     /**
      * scale the image to fit screen
      *
@@ -101,31 +116,24 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
      */
     private Bitmap scaleBitmap(String path) {
         File file = new File(path);
-        Uri uri = Uri.fromFile(file);
-        try {
-            Bitmap bitmap = null;
-            bitmap = ImageUtil.getBitmap(this, uri);
-            int bitmapHeight = bitmap.getHeight();
-            int bitmapWidth = bitmap.getWidth();
-            int canvasWidth = mAnnotatedView.getWidth();
-            int canvasHeight = mAnnotatedView.getHeight();
-            Matrix matrix = new Matrix();
-            if ((bitmapHeight > canvasHeight && bitmapHeight > bitmapWidth) || (bitmapHeight > bitmapWidth && bitmapHeight < canvasHeight)) {
-                int newWidth = canvasHeight * bitmapWidth / bitmapHeight;
-                float scaleWidth = ((float) newWidth) / bitmapWidth;
-                float scaleHeight = ((float) canvasHeight) / bitmapHeight;
-                matrix.postScale(scaleWidth, scaleHeight);
-            } else {
-                int newHeight = canvasWidth * bitmapHeight / bitmapWidth;
-                float scaleWidth = ((float) canvasWidth) / bitmapWidth;
-                float scaleHeight = ((float) newHeight) / bitmapHeight;
-                matrix.postScale(scaleWidth, scaleHeight);
-            }
-            return Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
-        } catch (IOException e) {
-            e.printStackTrace();
+        Bitmap bitmap = ImageUtil.decodeSampledBitmapFromFile(file);
+        int bitmapHeight = bitmap.getHeight();
+        int bitmapWidth = bitmap.getWidth();
+        int canvasWidth = mAnnotatedView.getWidth();
+        int canvasHeight = mAnnotatedView.getHeight();
+        Matrix matrix = new Matrix();
+        if ((bitmapHeight > canvasHeight && bitmapHeight > bitmapWidth) || (bitmapHeight > bitmapWidth && bitmapHeight < canvasHeight)) {
+            int newWidth = canvasHeight * bitmapWidth / bitmapHeight;
+            float scaleWidth = ((float) newWidth) / bitmapWidth;
+            float scaleHeight = ((float) canvasHeight) / bitmapHeight;
+            matrix.postScale(scaleWidth, scaleHeight);
+        } else {
+            int newHeight = canvasWidth * bitmapHeight / bitmapWidth;
+            float scaleWidth = ((float) canvasWidth) / bitmapWidth;
+            float scaleHeight = ((float) newHeight) / bitmapHeight;
+            matrix.postScale(scaleWidth, scaleHeight);
         }
-        return null;
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
     }
 
     @Override
@@ -257,14 +265,15 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     }
 
-    class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
+    private class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             mSaveImageProgressDialog = new ProgressDialog(WorkSpaceActivity.this);
             mSaveImageProgressDialog.show();
-            mSaveImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message));
+            mSaveImageProgressDialog.setCanceledOnTouchOutside(false);
+            mSaveImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message_save));
         }
 
         @Override
@@ -282,6 +291,38 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
                 Util.showToast(WorkSpaceActivity.this, getResources().getString(R.string.save_failed));
             }
         }
+    }
+
+    private class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingImageProgressDialog = new ProgressDialog(WorkSpaceActivity.this);
+            mLoadingImageProgressDialog.setCanceledOnTouchOutside(false);
+            mLoadingImageProgressDialog.show();
+            mLoadingImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message_load));
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            Bitmap bitmap = scaleBitmap(mImageItem.path);
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if (bitmap != null) {
+                mLoadingImageProgressDialog.dismiss();
+                mAnnotatedView.setBitmap(bitmap);
+            } else {
+                Util.showToast(WorkSpaceActivity.this, getResources().getString(R.string.save_failed));
+            }
+
+
+        }
+
     }
 
     private void backConfirm() {
