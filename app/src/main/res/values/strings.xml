@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Annotation</string>
+    <string name="app_name">AnnoMarvin</string>
     <string name="take_photo">Take Photo</string>
     <string name="convert">Convert</string>
     <string name="save">Save</string>
@@ -8,14 +8,20 @@
     <string name="permission_tip">Check your permission</string>
     <string name="save_failed">Failed Try again</string>
     <string name="no_image">No Images</string>
-    <string name="dialog_message_save">Saving...</string>
-    <string name="dialog_message_load">Loading...</string>
-    <string name="dialog_discard_title">Discard changes?</string>
-    <string name="dialog_discard_message">Your changes are not saved</string>
-    <string name="dialog_positive_button">DISCARD</string>
-    <string name="dialog_negative_button">CANCEL</string>
+    <string name="dialog_msg_save">Saving...</string>
+    <string name="dialog_msg_load">Loading...</string>
+    <string name="dialog_title_discard">Discard changes?</string>
+    <string name="dialog_msg_discard">Your changes are not saved</string>
+    <string name="dialog_positive_button_discard">DISCARD</string>
+    <string name="dialog_negative_button_cancel">CANCEL</string>
+    <string name="dialog_positive_button_clear">CLEAR</string>
     <string name="file_provider_name">com.timfei.file_provider</string>
     <string name="line">Line</string>
     <string name="arrow">Arrow</string>
     <string name="square">Square</string>
+    <string name="title_send_file">Send with</string>
+    <string name="share_failed">Shard failed</string>
+    <string name="dialog_title_clear_all">Clear all effects?</string>
+    <string name="dialog_msg_clear_all">All effects will be deleted</string>
+    <string name="save_no_effects_there">No modification</string>
 </resources>

@@ -22,16 +22,18 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorAccent"
         android:orientation="horizontal">
 
         <RelativeLayout
+            android:id="@+id/workspace_toolbox_rl"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/tool_box_bar_selector"
+            android:clickable="true">
 
             <ImageView
-                android:id="@+id/workspace_toolbox"
+                android:id="@+id/workspace_toolbox_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -43,12 +45,15 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/workspace_undo_rl"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/tool_box_bar_selector"
+            android:clickable="true">
 
             <ImageView
-                android:id="@+id/workspace_undo"
+                android:id="@+id/workspace_undo_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -59,12 +64,15 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/workspace_redo_rl"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/tool_box_bar_selector"
+            android:clickable="true">
 
             <ImageView
-                android:id="@+id/workspace_redo"
+                android:id="@+id/workspace_redo_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -76,18 +84,21 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/workspace_clear_all_rl"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/tool_box_bar_selector"
+            android:clickable="true">
 
             <ImageView
-                android:id="@+id/workspace_smile"
+                android:id="@+id/workspace_clear_all_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/padding_8dp"
-                android:src="@drawable/ic_smile"/>
+                android:src="@drawable/ic_clear_all"/>
 
 
         </RelativeLayout>

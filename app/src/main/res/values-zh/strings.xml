@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Annotation</string>
+    <string name="app_name">AnnoMarvin</string>
     <string name="take_photo">拍照</string>
     <string name="convert">转换</string>
     <string name="save">保存</string>
@@ -8,13 +8,19 @@
     <string name="permission_tip">检查权限设置</string>
     <string name="save_failed">保存失败</string>
     <string name="no_image">没有图片</string>
-    <string name="dialog_message_save">保存中...</string>
-    <string name="dialog_message_load">加载中...</string>
-    <string name="dialog_discard_title">丢弃保存？</string>
-    <string name="dialog_discard_message">当前更改还未保存</string>
-    <string name="dialog_positive_button">丢弃</string>
-    <string name="dialog_negative_button">取消</string>
+    <string name="dialog_msg_save">保存中...</string>
+    <string name="dialog_msg_load">加载中...</string>
+    <string name="dialog_title_discard">丢弃保存？</string>
+    <string name="dialog_msg_discard">当前更改还未保存</string>
+    <string name="dialog_positive_button_discard">丢弃</string>
+    <string name="dialog_negative_button_cancel">取消</string>
+    <string name="dialog_positive_button_clear">清空</string>
     <string name="line">线条</string>
     <string name="arrow">箭头</string>
     <string name="square">矩形</string>
+    <string name="title_send_file">发送方式</string>
+    <string name="share_failed">分享失败</string>
+    <string name="dialog_title_clear_all">清空所有操作？</string>
+    <string name="dialog_msg_clear_all">所有效果将被删除</string>
+    <string name="save_no_effects_there">当前无任何修改</string>
 </resources>

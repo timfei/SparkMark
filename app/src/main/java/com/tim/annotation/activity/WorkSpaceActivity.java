@@ -1,29 +1,20 @@
 package com.tim.annotation.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -39,42 +30,38 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import at.markushi.ui.CircleButton;
-
 
 /**
  * Created by TimFei on 16/9/18.
  */
 public class WorkSpaceActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private AnnotatedView mAnnotatedView;
-    private ImageView mToolbox;
-    private View mLl_ToolBar;
     private ImageItem mImageItem;
-    private ProgressDialog mSaveImageProgressDialog;
-    private ProgressDialog mLoadingImageProgressDialog;
     private String fileName;
     private static final String SAVE_PATH = "/storage/emulated/0/Annotation/";
-    private LayoutInflater mInflater = null;
-    private PopupWindow mToolBoxPW;
-    private View toolBoxContentView;
-    private ImageView mUnDo;
-    private ImageView mReDo;
     private boolean isLoaded;
 
-    private CircleButton mToolboxGesture;
-    private CircleButton mToolboxArrow;
-    private CircleButton mToolboxText;
-    private CircleButton mToolboxRect;
+    private ProgressDialog mSaveImageProgressDialog;
+    private ProgressDialog mLoadingImageProgressDialog;
+    private AnnotatedView mAnnotatedView;
+    private ImageView mToolbox;
+    private ImageView mUnDo;
+    private ImageView mReDo;
+    private ImageView mClearAll;
+    private View mView_ToolBox;
+    private View mView_UnDo;
+    private View mView_ReDo;
+    private View mView_ClearAll;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace);
+        setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initView();
         initData();
-        setToolBoxPopupWindow();
         loadImage();
     }
 
@@ -94,14 +81,18 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initView() {
-        mLl_ToolBar = findViewById(R.id.workspace_bottom_bar_ll);
         mAnnotatedView = (AnnotatedView) findViewById(R.id.annotatedview);
-        mToolbox = (ImageView) findViewById(R.id.workspace_toolbox);
-        mUnDo = (ImageView) findViewById(R.id.workspace_undo);
-        mReDo = (ImageView) findViewById(R.id.workspace_redo);
-        mUnDo.setOnClickListener(this);
-        mReDo.setOnClickListener(this);
-        mToolbox.setOnClickListener(this);
+        mToolbox = (ImageView) findViewById(R.id.workspace_toolbox_iv);
+        mUnDo = (ImageView) findViewById(R.id.workspace_undo_iv);
+        mReDo = (ImageView) findViewById(R.id.workspace_redo_iv);
+        mView_ToolBox = findViewById(R.id.workspace_toolbox_rl);
+        mView_UnDo = findViewById(R.id.workspace_undo_rl);
+        mView_ReDo = findViewById(R.id.workspace_redo_rl);
+        mView_ClearAll = findViewById(R.id.workspace_clear_all_rl);
+        mView_ToolBox.setOnClickListener(this);
+        mView_UnDo.setOnClickListener(this);
+        mView_ReDo.setOnClickListener(this);
+        mView_ClearAll.setOnClickListener(this);
     }
 
     private void initData() {
@@ -148,11 +139,25 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         int id = item.getItemId();
         switch (id) {
             case R.id.workspace_save:
-                new SaveBitmapTask().execute();
+                if (mAnnotatedView != null && mAnnotatedView.getSavePathCount() > 0) {
+                    new SaveBitmapTask().execute();
+                } else {
+                    Util.showToast(WorkSpaceActivity.this, getString(R.string.save_no_effects_there));
+                }
                 break;
 
             case R.id.workspace_share:
-
+                File file = saveBitmap();
+                if (file != null) {
+                    ImageUtil.scanPhoto(WorkSpaceActivity.this, file);
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, getResources().getString(R.string.file_provider_name), file));
+                    shareIntent.setType("image/*");
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.title_send_file)));
+                } else {
+                    Util.showToast(WorkSpaceActivity.this, getString(R.string.share_failed));
+                }
                 break;
 
             case android.R.id.home:
@@ -166,7 +171,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveBitmap() {
+    private File saveBitmap() {
         mAnnotatedView.setDrawingCacheEnabled(true);
         Bitmap drawingCache = mAnnotatedView.getDrawingCache();
         File dir = new File(SAVE_PATH);
@@ -188,45 +193,14 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
             e.printStackTrace();
 
         }
-        ImageUtil.scanPhoto(this, file);
+        return file;
     }
 
-    private void setToolBoxPopupWindow() {
-        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        toolBoxContentView = mInflater.inflate(R.layout.popuwindow_toolbox, null);
-        mToolBoxPW = new PopupWindow(toolBoxContentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mToolBoxPW.setFocusable(true);
-        mToolBoxPW.setOutsideTouchable(true);
-        mToolBoxPW.update();
-        ColorDrawable backgroundColor = new ColorDrawable(0000000000);
-        mToolBoxPW.setBackgroundDrawable(backgroundColor);
-        initToolBoxView(toolBoxContentView);
-
-    }
-
-    private void initToolBoxView(View contentView) {
-        mToolboxGesture = (CircleButton) contentView.findViewById(R.id.toolbox_gesture);
-        mToolboxArrow = (CircleButton) contentView.findViewById(R.id.toolbox_arrow);
-        mToolboxText = (CircleButton) contentView.findViewById(R.id.toolbox_text);
-        mToolboxRect = (CircleButton) contentView.findViewById(R.id.toolbox_rect);
-        mToolboxGesture.setOnClickListener(this);
-        mToolboxArrow.setOnClickListener(this);
-        mToolboxText.setOnClickListener(this);
-        mToolboxRect.setOnClickListener(this);
-    }
-
-    private void showToolBoxPopupWindow(View parent) {
-        if (mToolBoxPW.isShowing()) {
-            mToolBoxPW.dismiss();
-        } else {
-            mToolBoxPW.showAsDropDown(parent, 0, mLl_ToolBar.getHeight() / 2);
-        }
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.workspace_toolbox:
+            case R.id.workspace_toolbox_rl:
                 new MaterialDialog.Builder(this)
                         .items(R.array.work_tool_items)
                         .itemsCallback(new MaterialDialog.ListCallback() {
@@ -251,43 +225,48 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
                             }
                         }).show();
-//                showToolBoxPopupWindow(mToolbox);
                 break;
 
-            case R.id.workspace_undo:
+            case R.id.workspace_undo_rl:
                 mAnnotatedView.unDo();
                 break;
 
-            case R.id.workspace_redo:
+            case R.id.workspace_redo_rl:
                 mAnnotatedView.recover();
                 break;
 
-            case R.id.toolbox_gesture:
-                mAnnotatedView.setTool(Constant.CODE_TOOL_GESTURE);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture_48));
-                mToolBoxPW.dismiss();
+            case R.id.workspace_clear_all_rl:
+                if (mAnnotatedView != null && mAnnotatedView.getSavePathCount() > 0) {
+                    clearAllConfirmDialog();
+                }
                 break;
 
-
-            case R.id.toolbox_arrow:
-                mAnnotatedView.setTool(Constant.CODE_TOOL_ARROW);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow_48));
-                mToolBoxPW.dismiss();
-                break;
-
-            case R.id.toolbox_text:
-                mAnnotatedView.setTool(Constant.CODE_TOOL_TEXT);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_text_48));
-                mToolBoxPW.dismiss();
-                break;
-
-            case R.id.toolbox_rect:
-                mAnnotatedView.setTool(Constant.CODE_TOOL_RECT);
-                mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect_48));
-                mToolBoxPW.dismiss();
-                break;
         }
 
+    }
+
+    /**
+     * Clear all on workspace
+     */
+    private void clearAllConfirmDialog() {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
+                .title(R.string.dialog_title_clear_all)
+                .content(R.string.dialog_msg_clear_all)
+                .positiveText(getResources().getString(R.string.dialog_positive_button_clear))
+                .negativeText(getResources().getString(R.string.dialog_negative_button_cancel))
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        mAnnotatedView.reDo();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 
     private class SaveBitmapTask extends AsyncTask<Void, Void, Boolean> {
@@ -298,13 +277,18 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
             mSaveImageProgressDialog = new ProgressDialog(WorkSpaceActivity.this);
             mSaveImageProgressDialog.show();
             mSaveImageProgressDialog.setCanceledOnTouchOutside(false);
-            mSaveImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message_save));
+            mSaveImageProgressDialog.setMessage(getResources().getString(R.string.dialog_msg_save));
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            saveBitmap();
-            return true;
+            File file = saveBitmap();
+            if (file != null) {
+                ImageUtil.scanPhoto(WorkSpaceActivity.this, file);
+                return true;
+            } else {
+                return false;
+            }
         }
 
         @Override
@@ -326,7 +310,7 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
             mLoadingImageProgressDialog = new ProgressDialog(WorkSpaceActivity.this);
             mLoadingImageProgressDialog.setCanceledOnTouchOutside(false);
             mLoadingImageProgressDialog.show();
-            mLoadingImageProgressDialog.setMessage(getResources().getString(R.string.dialog_message_load));
+            mLoadingImageProgressDialog.setMessage(getResources().getString(R.string.dialog_msg_load));
         }
 
         @Override
@@ -352,10 +336,10 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
     private void backConfirm() {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
-                .title(getResources().getString(R.string.dialog_discard_title))
-                .content(getResources().getString(R.string.dialog_discard_message))
-                .positiveText(getResources().getString(R.string.dialog_positive_button))
-                .negativeText(getResources().getString(R.string.dialog_negative_button))
+                .title(getResources().getString(R.string.dialog_title_discard))
+                .content(getResources().getString(R.string.dialog_msg_discard))
+                .positiveText(getResources().getString(R.string.dialog_positive_button_discard))
+                .negativeText(getResources().getString(R.string.dialog_negative_button_cancel))
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
