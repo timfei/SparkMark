@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.tim.annotation.R;
 
 import java.io.File;
@@ -17,11 +18,14 @@ import java.io.File;
 public class GlideImageLoader implements ImageLoader {
     @Override
     public void displayImage(Context context, String path, ImageView imageView) {
+
+        RequestOptions options = new RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .error(R.drawable.ic_default_image);
+
         Glide.with(context)
                 .load(Uri.fromFile(new File(path)))
-                .error(R.drawable.ic_default_image)
-                .placeholder(R.drawable.ic_default_image)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .apply(options)
                 .into(imageView);
     }
 

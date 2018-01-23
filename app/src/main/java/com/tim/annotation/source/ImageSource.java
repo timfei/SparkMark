@@ -122,6 +122,6 @@ public class ImageSource implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public interface OnImageLoadFinished {
-        void imageLoadFinish(List<ImageFolder> imageFolders);
+        void imageLoadFinish(ArrayList<ImageFolder> imageFolders);
     }
 }

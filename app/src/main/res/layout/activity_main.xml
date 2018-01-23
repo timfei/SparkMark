@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/dimen_3dp"
     tools:context=".activity.MainActivity">
 
-    <GridView
-        android:id="@+id/main_gridview"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:horizontalSpacing="@dimen/dimen_3dp"
-        android:paddingBottom="@dimen/dimen_3dp"
-        android:paddingLeft="@dimen/dimen_3dp"
-        android:paddingRight="@dimen/dimen_3dp"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="@dimen/dimen_3dp"></GridView>
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 
 
     <ImageView
@@ -25,6 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:src="@drawable/ic_ghost"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </FrameLayout>

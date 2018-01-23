@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AnnoMarvin</string>
+    <string name="app_name">SparkMark</string>
     <string name="take_photo">拍照</string>
     <string name="convert">转换</string>
     <string name="save">保存</string>

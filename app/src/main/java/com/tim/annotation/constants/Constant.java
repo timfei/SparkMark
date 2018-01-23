@@ -7,6 +7,10 @@ public class Constant {
 
     public static final String EXTRA_PICK_IMAGE_ITEM = "extra_pick_image_item";
     public static final int EXTRA_TAKE_PHOTO_CODE = 100;
+    public static final int REQUEST_CODE_SHARE_INTENT = 101;
+
+    public static final int CODE_WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 201;
+    public static final int CODE_CAMERA_REQUEST = 202;
 
     public static final int CODE_TOOL_GESTURE = 10;
     public static final int CODE_TOOL_ARROW = 11;

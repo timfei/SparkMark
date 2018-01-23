@@ -147,16 +147,21 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.workspace_share:
-                File file = saveBitmap();
-                if (file != null) {
-                    ImageUtil.scanPhoto(WorkSpaceActivity.this, file);
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, getResources().getString(R.string.file_provider_name), file));
-                    shareIntent.setType("image/*");
-                    startActivity(Intent.createChooser(shareIntent, getString(R.string.title_send_file)));
+                if (mAnnotatedView.getSavePathCount() > 0) {
+                    File file = saveBitmap();
+                    if (file != null) {
+                        shareIntent(file);
+                    } else {
+                        Util.showToast(WorkSpaceActivity.this, getString(R.string.share_failed));
+                    }
                 } else {
-                    Util.showToast(WorkSpaceActivity.this, getString(R.string.share_failed));
+                    File file = new File(mImageItem.path);
+                    if (file != null) {
+                        shareIntent(file);
+                    } else {
+                        Util.showToast(WorkSpaceActivity.this, getString(R.string.share_failed));
+                    }
+
                 }
                 break;
 
@@ -169,6 +174,15 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void shareIntent(File file) {
+        ImageUtil.scanPhoto(WorkSpaceActivity.this, file);
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, getResources().getString(R.string.file_provider_name), file));
+        shareIntent.setType("image/*");
+        startActivityForResult(Intent.createChooser(shareIntent, getString(R.string.title_send_file)), Constant.REQUEST_CODE_SHARE_INTENT);
     }
 
     private File saveBitmap() {
@@ -209,17 +223,17 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
                                 switch (position) {
                                     case 0:
                                         mAnnotatedView.setTool(Constant.CODE_TOOL_GESTURE);
-                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture_48));
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_gesture));
                                         break;
 
                                     case 1:
                                         mAnnotatedView.setTool(Constant.CODE_TOOL_ARROW);
-                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow_48));
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_arrow));
                                         break;
 
                                     case 2:
                                         mAnnotatedView.setTool(Constant.CODE_TOOL_RECT);
-                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect_48));
+                                        mToolbox.setImageDrawable(getDrawable(R.drawable.ic_rect));
                                         break;
                                 }
 
@@ -332,6 +346,13 @@ public class WorkSpaceActivity extends AppCompatActivity implements View.OnClick
 
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constant.REQUEST_CODE_SHARE_INTENT) {
+        }
     }
 
     private void backConfirm() {

@@ -7,19 +7,13 @@ import java.io.Serializable;
  */
 public class ImageItem implements Serializable {
 
-    public String name;       //图片的名字
-
-    public String path;       //图片的路径
-
-    public long size;         //图片的大小
-
-    public int width;         //图片的宽度
-
-    public int height;        //图片的高度
-
-    public String mimeType;   //图片的类型
-
-    public long addTime;      //图片的创建时间
+    public String name;
+    public String path;
+    public long size;
+    public int width;
+    public int height;
+    public String mimeType;
+    public long addTime;
 
     @Override
     public boolean equals(Object o) {

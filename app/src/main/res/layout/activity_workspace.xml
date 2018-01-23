@@ -39,7 +39,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/padding_8dp"
-                android:src="@drawable/ic_gesture_48"/>
+                android:src="@drawable/ic_gesture"/>
 
 
         </RelativeLayout>
