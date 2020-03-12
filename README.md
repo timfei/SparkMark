@@ -5,5 +5,5 @@ SparkMark let you markup your images.
 - Rectangle
 - Revoke
 
-![](https://ws3.sinaimg.cn/large/006tKfTcgy1fnqj3xl99tj30sg0lch10.jpg)
+![](https://i.loli.net/2020/03/12/OM8bA42jzs7ZUyx.jpg)
 
